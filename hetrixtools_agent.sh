@@ -62,7 +62,8 @@ CheckSoftRAID=0
 # * requirements: 'S.M.A.R.T.' for HDD/SSD or 'nvme-cli' for NVMe
 # * (these do not get installed by our agent, you must install them separately)
 # * agent must be run as 'root' or privileged user to use this function
-# * 0 - OFF (default) | 1 - ON
+# * 0 - OFF
+# WARN: Please do not enable it, since synology ds118 has lsblk command 
 CheckDriveHealth=0
 
 # View Running Processes
@@ -174,10 +175,16 @@ fi
 
 # Disks IOPS
 declare -A vDISKs
-for i in $(df | awk '$1 ~ /\// {print}' | awk '{ print $(NF) }')
-do
-	vDISKs[$i]=$(lsblk -l | grep -w "$i" | awk '{ print $1 }')
-done
+
+# for i in $(df | awk '$1 ~ /\// {print}' | awk '{ print $(NF) }')
+# do
+# 	vDISKs[$i]=$(lsblk -l | grep -w "$i" | awk '{ print $1 }')
+# done
+
+# hardcode since lsblk is not available on synology ds118
+vDISKs['/']='sda1'
+vDISKs['/volume1']='sda3'
+
 declare -A IOPSRead
 declare -A IOPSWrite
 diskstats=$(cat /proc/diskstats)
